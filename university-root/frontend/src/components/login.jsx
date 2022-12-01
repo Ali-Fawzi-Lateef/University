@@ -1,89 +1,81 @@
 import { Button, TextField } from "@mui/material";
-import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import Form from "react-validation/build/form";
-import Input from "react-validation/build/input";
-import CheckButton from "react-validation/build/button";
+import React, { useRef, useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+import axios from '../services/axios'
+// import AuthService from "../services/auth.service";
 
-import AuthService from "../services/auth.service";
-
-const required = (value) => {
-  if (!value) {
-    return (
-      <div className="invalid-feedback d-block">
-        This field is required!
-      </div>
-    );
-  }
-};
+const LOGIN_URL = '/api/login';
 
 const Login = () => {
-  const form = useRef();
-  const checkBtn = useRef();
+  const usernameRef = useRef();
+  const errRef = useRef();
 
-  const [Email, setEmail] = useState("");
+  const [username, setusername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [errMsg, setErrMsg] = useState("");
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const onChangeEmail = (e) => {
-    const Email = e.target.value;
-    setEmail(Email);
-  };
+  useEffect(() => {
+    usernameRef.current.focus();
+}, [])
 
-  const onChangePassword = (e) => {
-    const password = e.target.value;
-    setPassword(password);
-  };
+useEffect(() => {
+    setErrMsg('');
+}, [username, password])
 
-  const handleLogin = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setMessage("");
-    setLoading(true);
-
-    form.current.validateAll();
-
-    if (checkBtn.current.context._errors.length === 0) {
-      AuthService.login(Email, password).then(
-        () => {
-          navigate("/dashboard");
-          window.location.reload();
-        },
-        (error) => {
-          // const resMessage =
-          //   (error.response &&
-          //     error.response.data &&
-          //     error.response.data.message) ||
-          //   error.message ||
-          //   error.toString();
-          setLoading(false);
-          setMessage("Invalid input");
-        }
+    try {
+      const response = await axios.post(LOGIN_URL,
+          JSON.stringify({ username, password }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+            // withCredentials: true // should work later
+          }
       );
-    } else {
-      setLoading(false);
+      console.log(JSON.stringify(response?.data));
+            //console.log(JSON.stringify(response));
+            const accessToken = response?.data?.accessToken;
+            console.log(accessToken);
+            setusername('');
+            setPassword('');
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg('No Server Response');
+            } else if (err.response?.status === 400) {
+                setErrMsg('Missing username or Password');
+            } else if (err.response?.status === 401) {
+                setErrMsg('Unauthorized');
+            } else {
+                setErrMsg('Login Failed');
+            }
+            errRef.current.focus();
+        }
     }
-  };
 
   return(
-        <div className="relative flex flex-col justify-center min-h-screen overflow-hidden">
+        <section className="relative flex flex-col justify-center min-h-screen overflow-hidden">
           <div className="w-2/3  p-6  m-auto bg-white rounded-md shadow-xl shadow-gray-600/40 ring-2 ring-blue-500 lg:max-w-xl">
               <h1 className="text-3xl font-semibold text-center text-blue-600 ">
                 Login
               </h1>
-              <Form className="mt-6" onSubmit={handleLogin} ref={form}>
+              <p ref={errRef} className="text-red-500" aria-live="assertive">{errMsg}</p>
+              <form className="mt-6" onSubmit={handleSubmit}>
                 <div className="mb-10">
                 <TextField 
                 autoComplete="off"
-                id="email"
-                label="email" 
+                id="username"
+                label="Username" 
+                ref={usernameRef}
                 className="w-full rounded-md"
-                value={Email}
-                onChange={onChangeEmail}
-                validations={[required]} />
+                value={username}
+                onChange={(e) => setusername(e.target.value)}
+                required
+                error = {errMsg !== ""}
+                 />
                 </div>
                 
                 <div className="mb-2">
@@ -93,8 +85,9 @@ const Login = () => {
                 type="password" 
                 className="w-full rounded-md" 
                 value={password}
-                onChange={onChangePassword}
-                validations={[required]}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                error = {errMsg !== ""}
                 />
                 </div>
                 
@@ -104,22 +97,11 @@ const Login = () => {
                   Forget Password?
                 </span>
                 <div className="mt-8 flex justify-center">
-                <Button variant="outlined" className="bg-blue-700 text-white hover:text-blue-700" type="submit" disabled={loading}>
-                {loading && (
-                <span className="spinner-border spinner-border-sm"></span>
-              )}
+                <Button variant="outlined" className="bg-blue-700 text-white hover:text-blue-700" type="submit">
               <span>Login</span>
                 </Button>
               </div>
-              {message && (
-            <div className="form-group">
-              <div className="alert alert-danger" role="alert">
-                {message}
-              </div>
-            </div>
-          )}
-          <CheckButton style={{ display: "none" }} ref={checkBtn} />
-              </Form>
+              </form>
 
               <p className="mt-8 text-xs font-light text-center text-gray-700">
                 {" "}
@@ -130,7 +112,7 @@ const Login = () => {
                 </span>
               </p>
           </div>
-      </div>
+      </section>
     )
 } 
 

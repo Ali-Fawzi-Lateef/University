@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             // 'id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
             'id' => "1-2",
             'name'=> 'ali fawzi lateef',
-            'user_name'=> 'a9f_ssss',
+            'username'=> 'a9f_ssss',
             'email'=>'alifawzi@gmaill.coms',
             'password'=> password_hash('88888888',PASSWORD_DEFAULT),
             'verified_at'=> Carbon::now()->format('Y-m-d H:i:s'),

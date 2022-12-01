@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\PermissionCategory;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -26,9 +28,16 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = request(['email', 'password']);
+        $credentials = request(['username', 'password']);
         
-        if ($token = auth()->attempt($credentials)) {           
+        /*
+        * fetch the user category by user username
+        ! should find a cleaner way later.
+        */
+        $categoryId = User::where('username',$credentials['username'])->get();
+        $userCategory = PermissionCategory::where('id',$categoryId[0]->category_id)->get('name')[0]->name;
+        
+        if ($token = auth()->claims(['user_category' => $userCategory])->attempt($credentials)) {           
             return $this->respondWithToken($token);
         }
 

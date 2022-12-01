@@ -16,12 +16,15 @@ use App\Http\Controllers\UserController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+// Route::middleware(['cors'])->group(function () {
+//     Route::post('/login', [AuthController::class , 'login']);
+// });
 
 Route::group([
 
-    'middleware' => 'api',
+    'middleware' => 'cors',
     'namespace' => 'App\Http\Controllers',
-    'prefix' => 'auth'
+    // 'prefix' => 'auth'
 
 ], function ($router) {
 

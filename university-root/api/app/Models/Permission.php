@@ -20,7 +20,6 @@ class Permission extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'id',
         'category_id',
         'name'
     ];

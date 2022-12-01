@@ -8,6 +8,7 @@ import { StyledEngineProvider } from '@mui/material';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+   {/* to make material ui and tailwindcss works togater */}
   <StyledEngineProvider injectFirst>
     <App />
     </StyledEngineProvider>

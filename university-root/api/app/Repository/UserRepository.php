@@ -66,6 +66,6 @@ class UserRepository implements IUserRepository{
 
     public function deleteUser($id)
     {
-        return  User::destroy(1);
+        return  User::destroy($id);
     }
 }
