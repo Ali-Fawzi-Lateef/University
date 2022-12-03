@@ -2,8 +2,9 @@ import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import image from '../assets/img2.jpg';
 
-export function Home() {
-  return <>
+export default function Home() {
+  return (
+  <>
   <section className='bg-gradient-to-r from-slate-900 to-gray-400 w-full h-screen relative'>
   <img 
   className="object-cover w-full h-full absolute mix-blend-overlay"
@@ -19,5 +20,6 @@ export function Home() {
     </Link>
   </div>
   </section>
-  </>;
+  </>
+  )
 }

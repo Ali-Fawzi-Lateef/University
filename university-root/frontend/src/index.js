@@ -4,14 +4,17 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { StyledEngineProvider } from '@mui/material';
+import { AuthProvider } from './context/AuthProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-   {/* to make material ui and tailwindcss works togater */}
-  <StyledEngineProvider injectFirst>
-    <App />
-    </StyledEngineProvider>
+    {/* to make material ui and tailwindcss works togater */}
+      <StyledEngineProvider injectFirst>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </StyledEngineProvider>
   </React.StrictMode>
 );
 

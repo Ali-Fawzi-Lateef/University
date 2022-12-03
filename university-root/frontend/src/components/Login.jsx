@@ -1,12 +1,14 @@
 import { Button, TextField } from "@mui/material";
 import React, { useRef, useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from '../services/axios'
-// import AuthService from "../services/auth.service";
+import jwt_decode from "jwt-decode";
+import useAuth from '../hooks/useAuth';
 
 const LOGIN_URL = '/api/login';
 
 const Login = () => {
+  const { setAuth } = useAuth();
   const usernameRef = useRef();
   const errRef = useRef();
 
@@ -14,7 +16,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     usernameRef.current.focus();
@@ -33,13 +35,16 @@ useEffect(() => {
           JSON.stringify({ username, password }),
           {
             headers: { 'Content-Type': 'application/json' },
-            // withCredentials: true // should work later
+            withCredentials: true // should work later
           }
       );
-      console.log(JSON.stringify(response?.data));
-            //console.log(JSON.stringify(response));
-            const accessToken = response?.data?.accessToken;
-            console.log(accessToken);
+      const accessToken = response?.data?.access_token;
+      const roles = jwt_decode(response?.data.access_token).user_category;
+      setAuth({ username, password, roles, accessToken });
+            switch(roles){
+              case 'dean':
+                navigate('../dashboard');
+            }
             setusername('');
             setPassword('');
         } catch (err) {
