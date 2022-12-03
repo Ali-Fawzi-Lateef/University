@@ -1,4 +1,7 @@
-export class ErrorBoundary extends React.Component {
+import React from "react";
+
+// ! could be helpful when it's in production mode.
+class ErrorBoundary extends React.Component {
 constructor(props) {
     super(props);
     this.state = { error: null, errorInfo: null };
@@ -31,3 +34,4 @@ render() {
     return this.props.children;
     }  
 }
+export default ErrorBoundary;
