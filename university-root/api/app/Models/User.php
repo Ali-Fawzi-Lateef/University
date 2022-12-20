@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\Traits\HasUuid;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Notifications\Notifiable;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable
 {
-    use Notifiable, HasUuid;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -18,43 +19,58 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'name',
-        'user_name',
+        'username',
         'email',
+        'password',
         'verified_at',
         'registered_at',
         'birthdate',
-        'profile_photo_url',
-        'catagory_id'
+        'profile_photo_url'
     ];
-    // Rest omitted for brevity
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    /**
+     * Prevent elqouent from creating created_at updated_at fields.
+     * @var bool
+     */
     public $timestamps = false;
 
-    // for uuid type
-    protected $keyType = 'string';
-
     /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
+     * user table has a one to one relationship with the following;
+     * admin, teacher, graduatedStudent, student.
      */
-    public function getJWTIdentifier()
+    public function admin()
     {
-       
-        return $this->getKey();
+        return $this->hasOne(admin::class);
     }
-
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
+    public function teacher()
     {
-        return [];
+        return $this->hasOne(teacher::class);
     }
-    public function PermissionCategory()
+    public function graduatedStudent()
     {
-        return $this->belongsTo(PermissionCategory::class);
+        return $this->hasOne(graduatedStudent::class);
+    }
+    public function student()
+    {
+        return $this->hasOne(student::class);
     }
 }
-
