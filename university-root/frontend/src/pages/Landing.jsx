@@ -1,9 +1,8 @@
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Footer from '../layouts/Footer';
-import images from '../services/images';
+import images from '../utils/images';
 export default function Landing() {
-  console.log(images);
   return (
   <>
     <section className='bg-gradient-to-r from-blue-200 flex flex-col min-h-screen justify-between '>

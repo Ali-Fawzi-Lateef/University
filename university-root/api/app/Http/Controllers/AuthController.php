@@ -1,58 +1,66 @@
 <?php
 namespace App\Http\Controllers;
 
- 
-
+use App\Models\User;
 use Illuminate\Http\Request;
 
-use Illuminate\Support\Facades\Hash;
-
+use App\Traits\HttpResponeses;
 use Illuminate\Support\Facades\Auth;
 
-use App\Models\User;
-
- 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
-
 {
-
-        public function register(Request $request){
-
-        $post_data = $request->validate([
-                'name'=>'required|string',
-                'email'=>'required|string|email|unique:users',
-                'password'=>'required|min:8'
-        ]);
- 
+        use HttpResponeses;
+        public function register(Request $request) 
+        {
+            $validated = $request->validate([
+                'email' => ['required', 'string', 'email'],
+                'password' => ['required', 'string', 'min:8'],
+                'name' => ['required', 'string']
+                ]);
+            $request->validated($request->only(['name', 'email', 'password']));
+    
             $user = User::create([
-            'name' => $post_data['name'],
-            'email' => $post_data['email'],
-            'password' => Hash::make($post_data['password']),
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                
             ]);
- 
-            $token = $user->createToken('authToken')->plainTextToken;
- 
-            return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
+    
+            return $this->success([
+                'user' => $user,
+                'token' => $user->createToken('API Token')->plainTextToken
             ]);
         }
- 
+    
+        public function logout() 
+        {
+            Auth::user()->currentAccessToken()->delete();
+    
+            return $this->success([
+                'message' => 'You have succesfully been logged out and your token has been removed'
+            ]);
+        }
+
         public function login(Request $request){
-        if (Auth::attempt($request->only('email', 'password'))) {
-               return response()->json([
-                'message' => 'Login information is invalid.'
-              ], 401);
-        }
- 
-        $user = User::where('email', $request['email'])->firstOrFail();
-                $token = $user->createToken('authToken')->plainTextToken;
- 
-            return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            ]);
+
+                $validated = $request->validate([
+                'email' => ['required', 'string', 'email'],
+                'password' => ['required', 'string', 'min:8'],
+                ]);
+                if(!Auth::attempt($request->only(['email', 'password'] ,$request->rememberMe ?? false))) {
+                    return $this->error('', 'Credentials do not match', 401);
+                }
+                $user = User::where('email', $request->email)->first();
+
+                if(!is_null($user->verified_at))
+                return $this->success([
+                    'user_type' => $user->user_type,
+                    'token' => $user->createToken('API Token',[$user->user_type])->plainTextToken
+                ]); 
+                return $this->error('', 'User is not verified',401);
         }
 
 }

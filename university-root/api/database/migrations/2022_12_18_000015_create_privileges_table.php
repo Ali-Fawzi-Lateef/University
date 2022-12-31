@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('privileges', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->string('type_of_privilege');
-            $table->bigInteger('admins_id');
+            $table->unsignedBigInteger('admins_id');
             $table->foreign('admins_id')->references('id')->on('admins')
             ->onDelete('cascade');
         });

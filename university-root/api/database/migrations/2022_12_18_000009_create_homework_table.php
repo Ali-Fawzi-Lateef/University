@@ -14,13 +14,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('homework', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->timestamp('date');
             $table->string('name');
             $table->string('path_to_file');
             $table->string('file_type');
             $table->float('score');
-            $table->bigInteger('curriculums_id');
+            $table->unsignedBigInteger('curriculums_id');
             $table->foreign('curriculums_id')->references('id')->on('curriculums')
             ->onDelete('cascade');
         });

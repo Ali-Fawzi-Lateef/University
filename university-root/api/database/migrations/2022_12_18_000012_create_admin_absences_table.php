@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('admin_absences', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->timestamp('absence_date');
             $table->string('reason');
-            $table->bigInteger('admins_id');
+            $table->unsignedBigInteger('admins_id');
             $table->foreign('admins_id')->references('id')->on('admins')
             ->onDelete('cascade');
         });

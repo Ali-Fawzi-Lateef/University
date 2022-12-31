@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('curriculums', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->string('name');
-            $table->bigInteger('students_id');
+            $table->unsignedBigInteger('students_id');
             $table->foreign('students_id')->references('id')->on('students')
             ->onDelete('cascade');
         });

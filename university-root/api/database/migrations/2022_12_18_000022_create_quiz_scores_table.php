@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('quiz_scores', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->float('score');
-            $table->bigInteger('quizzes_id');
-            $table->bigInteger('students_id');
+            $table->unsignedBigInteger('quizzes_id');
+            $table->unsignedBigInteger('students_id');
             $table->foreign('quizzes_id')->references('id')->on('quizzes')
             ->onDelete('cascade');
             $table->foreign('students_id')->references('id')->on('students')

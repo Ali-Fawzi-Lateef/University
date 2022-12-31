@@ -1,5 +1,5 @@
 import { useState } from "react";
-import images from "../services/images";
+import images from "../utils/images";
 
 export default function AdminDashboard() {
   const [open, setOpen] = useState(true);

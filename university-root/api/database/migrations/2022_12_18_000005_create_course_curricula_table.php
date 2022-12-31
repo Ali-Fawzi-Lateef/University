@@ -14,12 +14,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('course_curricula', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->unsignedDecimal('stage');
-            $table->bigInteger('students_id');
+            $table->unsignedBigInteger('students_id');
+            $table->unsignedBigInteger('teachers_id');
             $table->foreign('students_id')->references('id')->on('students')
             ->onDelete('cascade');
-            $table->bigInteger('teachers_id');
             $table->foreign('teachers_id')->references('id')->on('teachers')
             ->onDelete('cascade');
         });

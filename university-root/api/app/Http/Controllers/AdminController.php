@@ -14,7 +14,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json('admin controller protected');
     }
 
     /**

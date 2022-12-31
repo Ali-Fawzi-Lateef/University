@@ -1,83 +1,63 @@
 import { Button, TextField } from "@mui/material";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-
-import { useRef, useState, useEffect } from "react";
-import { useNavigate , useLocation } from "react-router-dom";
-import axios from '../services/axios'
-import jwt_decode from "jwt-decode";
-import useAuth from '../hooks/useAuth';
 import "./../assets/backgroundStyles.css";
-
-const LOGIN_URL = '/api/login';
+import axios from '../utils/axios';
+import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { setAuth , persist , setPersist } = useAuth();
   
-  const usernameRef = useRef();
+  const emailRef = useRef();
   const errRef = useRef();
   
-  const [username, setusername] = useState("");
+  const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
-  const [errMsg, setErrMsg] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
-  
+  const [errMsg, setErrMsg] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    usernameRef.current.focus();
+useEffect(() => {
+    emailRef.current.focus();
 }, [])
 
 useEffect(() => {
     setErrMsg('');
-}, [username, password])
+}, [email, password])
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await axios.post(LOGIN_URL,
-          JSON.stringify({ username, password }),
-          {
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true 
-          }
-      );
-      const access_token = response?.data?.access_token;
-      const roles = jwt_decode(response?.data.access_token).user_category;
-      setAuth({ user:username, pwd:password, roles, access_token });
-      navigate('../dashboard', { replace: true });
-      switch(roles){
-        case 'dean':
-                // console.log(from)
+    axios.post("/login", JSON.stringify({ email, password, rememberMe }))
+      .then((response) => {
+          if (response.statusText === "OK") {
+              localStorage.setItem("isLoggedIn", true);
+              localStorage.setItem("token", response.data.data.token);
+              // setemail('');
+              // setPassword('');
+              switch (response.data.data.user_type) {
+                case 'admin':
+                  navigate('../AdminDashboard',{replace: true})
+                  break;
+                case 'teacher':
+                  navigate('../TeacherDashboard',{replace: true})
+                  break;
+                case 'student':
+                  navigate('../StudentDashboard',{replace: true})
+                  break;
+                default:
+                  navigate('../unVerfied',{replace: true})
+                  break;
               }
-            setusername('');
-            setPassword('');
-        } catch (err) {
-          if (!err?.response) {
-            setErrMsg('No Server Response');
-          } else if (err.response?.status === 400) {
-            setErrMsg('Missing username or Password');
-          } else if (err.response?.status === 401) {
-            setErrMsg('Unauthorized');
-          } else {
-                setErrMsg('Login Failed');
             }
+     
+      }).catch ((err) =>  {
+          console.log(err)
+          setErrMsg(err.response.data.message)
             errRef.current.focus();
-        }
+        })
     }
-
-    const togglePersist = () => {
-      setPersist(prev => !prev);
-    }
-
-    useEffect(() => {
-      window.localStorage.setItem("persist", persist);
-    }, [persist])
-
   return(
         <section id="Login" className="relative flex flex-col justify-center min-h-screen overflow-hidden">
           <div className="w-full sm:max-w-xl p-6 m-auto bg-white rounded-md shadow-xl shadow-gray-600/40 ring-2 ring-sky-600 lg:max-w-xl">
@@ -89,12 +69,12 @@ useEffect(() => {
                 <div className="mb-10">
                 <TextField 
                 autoComplete="off"
-                id="username"
-                label="Username" 
-                ref={usernameRef}
+                id="email"
+                label="email" 
+                ref={emailRef}
                 className="w-full rounded-md"
-                value={username}
-                onChange={(e) => setusername(e.target.value)}
+                value={email}
+                onChange={(e) => setemail(e.target.value)}
                 required
                 error = {errMsg !== ""}
                  />
@@ -118,9 +98,9 @@ useEffect(() => {
                 </p>
                 <FormControlLabel control={<Checkbox />} 
                   label="Remeber me"
-                  id="persist"
-                  // onChange={togglePersist}
-                  // checked={persist}
+                  id="rememberMe"
+                  value={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.value)}
                 /> 
                 <div className="mt-12 flex justify-center">
                 <Button variant="outlined" className="bg-sky-600 text-white hover:text-sky-600 w-full" type="submit">

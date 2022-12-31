@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('branches', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->string('name');
-            $table->bigInteger('course_curricula_id');
+            $table->unsignedBigInteger('course_curricula_id');
             $table->foreign('course_curricula_id')->references('id')->on('course_curricula')
             ->onDelete('cascade');
         });

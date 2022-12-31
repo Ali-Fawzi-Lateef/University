@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->timestamp('paid_date');
             $table->float('paid_amount');
-            $table->bigInteger('students_id');
+            $table->unsignedBigInteger('students_id');
             $table->foreign('students_id')->references('id')->on('students')
             ->onDelete('cascade');
         });
