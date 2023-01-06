@@ -2,8 +2,10 @@
 namespace App\Repositories;
 use App\Models\User;
 
-use App\Repositories\Interfaces\IUserRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use App\Repositories\Interfaces\IUserRepository;
 
 class UserRepository implements IUserRepository{
 
@@ -19,23 +21,28 @@ class UserRepository implements IUserRepository{
         return User::find($id);
     }
 
-    public function createOrUpdate($id = null, $collection = [])
+    public function addUser(Request $request)
     {
         
-        if(is_null($id)){
-            $user = new User;
-        } else {
-            $user = User::find($id);
-        }
-        $user->name=$collection['name'];
-        $user->user_name=$collection['user_name'];
-        $user->email=$collection['email'];
-        $user->password = Hash::make('password');
-        $user->verified_at=$collection['verified_at'];
-        $user->registered_at=$collection['registered_at'];
-        $user->birthdate=$collection['birthdate'];
-        $user->profile_photo_url=$collection['profile_photo_url'];
-        $user->category_id=$collection['category_id']; // ! manualy for now !!!
+        $user = new User;
+        $user->name=$request->name;
+        $user->password = Hash::make($request->password);
+        $user->username=$request->username;
+        $user->email=$request->email;
+        $user->user_type=$request->user_type;
+        $user->verified_at=Carbon::now()->toDateTimeString();
+        $user->registered_at=Carbon::now()->toDateTimeString();
+        $user->birthdate=$request->birthdate;
+        return $user->save();
+    }
+    public function editUser(Request $request)
+    {
+        $user = User::find($request->id);
+        $user->name=$request->name;
+        $user->username=$request->username;
+        $user->email=$request->email;
+        $user->user_type=$request->user_type;
+        $user->birthdate=$request->birthdate;
         return $user->save();
     }
 

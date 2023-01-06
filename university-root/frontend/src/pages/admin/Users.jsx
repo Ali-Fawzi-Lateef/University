@@ -1,35 +1,97 @@
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid , GridCellModes } from '@mui/x-data-grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { Button, CardActionArea } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import axios from '../../utils/axios';
 import images from "../../utils/images+icons";
 import { Link } from 'react-router-dom';
 import Swal from "sweetalert2";
+import PropTypes from 'prop-types';
+import Box from '@mui/material/Box';
+
+function EditToolbar(props) {
+  const { selectedCellParams, cellMode, cellModesModel, setCellModesModel } = props;
+
+  const handleSaveOrEdit = () => {
+    if (!selectedCellParams) {
+      return;
+    }
+    const { id, field } = selectedCellParams;
+    if (cellMode === 'edit') {
+      setCellModesModel({
+        ...cellModesModel,
+        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.View } },
+      });
+    } else {
+      setCellModesModel({
+        ...cellModesModel,
+        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.Edit } },
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    if (!selectedCellParams) {
+      return;
+    }
+    const { id, field } = selectedCellParams;
+    setCellModesModel({
+      ...cellModesModel,
+      [id]: {
+        ...cellModesModel[id],
+        [field]: { mode: GridCellModes.View, ignoreModifications: true },
+      },
+    });
+  };
+
+  const handleMouseDown = (event) => {
+    // Keep the focus in the cell
+    event.preventDefault();
+  };
+
+  return (
+    <Box
+      sx={{
+        borderBottom: 1,
+        borderColor: 'divider',
+        p: 1,
+      }}
+    >
+      <Button
+        onClick={handleSaveOrEdit}
+        onMouseDown={handleMouseDown}
+        disabled={!selectedCellParams}
+        variant="outlined"
+      >
+        {cellMode === 'edit' ? 'Save' : 'Edit'}
+      </Button>
+      <Button
+        onClick={handleCancel}
+        onMouseDown={handleMouseDown}
+        disabled={cellMode === 'view'}
+        variant="outlined"
+        sx={{ ml: 1 }}
+      >
+        Cancel
+      </Button>
+    </Box>
+  );
+}
+
+EditToolbar.propTypes = {
+  cellMode: PropTypes.oneOf(['edit', 'view']).isRequired,
+  cellModesModel: PropTypes.object.isRequired,
+  selectedCellParams: PropTypes.shape({
+    field: PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  }),
+  setCellModesModel: PropTypes.func.isRequired,
+};
 
 
-/**
- * users table fields
- */
-const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'name', headerName: 'Full Name', width: 130, editable: true},
-  { field: 'username', headerName: 'Username', width: 130, editable: true},
-  { field: 'email', headerName: 'Email', width: 160, editable: true},
-  { field: 'user_type', headerName: 'Type', width: 130, editable: true},
-  { field: 'verified_at', headerName: 'Verification Date',type:'date', width: 160, editable: true},
-  { field: 'registered_at', headerName: 'Registeration Date',type:'date', width: 150, editable: true},
-  { field: 'birthdate', headerName: 'Birthdate',type:'date', width: 120, editable: true},
-  // { field: 'edit', headerName: 'Edit', renderCell: () => (
-  //   <Link to='editUser'>
-  //     <Button className='rounded-full'>
-  //       <images.Edit/>
-  //     </Button>
-  //   </Link>
-  // ),}
-];
+
 /**
  * count number of occurance in json
  * used to count number of 
@@ -41,29 +103,59 @@ function getCount(arr, value)
   for (var i = 0; i < arr.length; i++) {
       if (arr[i].user_type === value) {
           count++;
-      }
+         }
   }
   return count;
 }
 /**
  * 
  * @returns Users page
- */
+*/
 export default function Users()
 {
-    // to make sure that api call happens only once.
-    const dataFetchedRef = useRef(false);
-    // const [selectedUser, setSelectedUser] = useState("");
+  const [selectedCellParams, setSelectedCellParams] = useState(null);
+  const [cellModesModel, setCellModesModel] = useState({});
+
+  const handleCellFocus = useCallback((event) => {
+    const row = event.currentTarget.parentElement;
+    const id = row.dataset.id;
+    const field = event.currentTarget.dataset.field;
+    setSelectedCellParams({ id, field });
+  }, []);
+
+  const cellMode = useMemo(() => {
+    if (!selectedCellParams) {
+      return 'view';
+    }
+    const { id, field } = selectedCellParams;
+    return cellModesModel[id]?.[field]?.mode || 'view';
+  }, [cellModesModel, selectedCellParams]);
+
+  const handleCellKeyDown = useCallback(
+    (params, event) => {
+      if (cellMode === 'edit') {
+        // Prevents calling event.preventDefault() if Tab is pressed on a cell in edit mode
+        event.defaultMuiPrevented = true;
+      }
+    },
+    [cellMode],
+  );
+
+  const [selectedUser, setSelectedUser] = useState(0);
+
+  // to make sure that api call happens only once.
+  const dataFetchedRef = useRef(false);
+  // const [selectedUser, setSelectedUser] = useState("");
     /**
      * fetch users data via http request and assign the data to a state varible
      * to use it in the table
      */
     const [rows, setRows] = useState([]);
     useEffect(()=>{
-        if (dataFetchedRef.current) return;
+      if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
         axios.get('/index').then((respone)=>{
-            setRows(respone.data)
+          setRows(respone.data)
         })  
     },[])
 
@@ -76,15 +168,26 @@ export default function Users()
         cancelButtonColor:"#94a3b8",
         focusCancel:true,
       }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
-
-          Swal.fire({
-            title:"Removed!",
-            confirmButtonColor:"#0ea5e9",
-            confirmButtonText:"OK",
-            icon:"success",
-            iconColor:"#0ea5e9"
+          axios.post('/deleteUser',JSON.stringify({id:selectedUser})).then(()=>{
+              Swal.fire({
+                title:"Removed!",
+                confirmButtonColor:"#0ea5e9",
+                confirmButtonText:"OK",
+                icon:"success",
+                iconColor:"#0ea5e9"
+              }).then(()=>{
+                window.location.reload();
+              })
+          }).catch((error)=>{
+            Swal.fire({
+              title:"failed to delete user!",
+              text:error.message,
+              confirmButtonColor:"#0ea5e9",
+              confirmButtonText:"OK",
+              icon:"error",
+              iconColor:"#d32f2f"
+            })
           })
         }
       })
@@ -92,8 +195,8 @@ export default function Users()
     /**
      * page content
      */
-  return (
-    <>
+    return (
+      <>
     {/* cards */}
     <span className='flex flex-row mb-4 space-x-32'>
      <Card sx={{ maxWidth: 345 }}>
@@ -179,20 +282,50 @@ export default function Users()
       </Link>
     </span>
     {/* Users table */}
-    <section className='w-full h-5/6'>
+    <section className='w-full h-5/6 bg-slate-100'>
       <DataGrid
         rows={rows}
         columns={columns}
         pageSize={10}
         rowsPerPageOptions={[10]}
-        checkboxSelection
+        onCellKeyDown={handleCellKeyDown}
+        cellModesModel={cellModesModel}
+        onCellModesModelChange={(model) => setCellModesModel(model)}
         components={{
-          Toolbar: GridToolbar,
+          Toolbar: EditToolbar
+        }}
+        componentsProps={{
+          toolbar: {
+            cellMode,
+            selectedCellParams,
+            setSelectedCellParams,
+            cellModesModel,
+            setCellModesModel,
+          },
+          cell: {
+            onFocus: handleCellFocus,
+          },
         }}
         experimentalFeatures={{ newEditingApi: true }}
-
+        onSelectionModelChange={(newSelectionArray) => {
+        setSelectedUser(newSelectionArray[0])
+      }}
       />
     </section>
     </>
   )
 }
+
+/**
+ * users table fields
+ */
+const columns = [
+  { field: 'id', headerName: 'ID', width: 70 },
+  { field: 'name', headerName: 'Full Name', width: 240, editable: true},
+  { field: 'username', headerName: 'Username', width: 180, editable: true},
+  { field: 'email', headerName: 'Email', width: 180, editable: true},
+  { field: 'user_type', headerName: 'Type', width: 130, editable: true},
+  { field: 'verified_at', headerName: 'Verification Date',type:'date', width: 170},
+  { field: 'registered_at', headerName: 'Registeration Date',type:'date', width: 170},
+  { field: 'birthdate', headerName: 'Birthdate',type:'date', width: 120, editable: true},
+];
