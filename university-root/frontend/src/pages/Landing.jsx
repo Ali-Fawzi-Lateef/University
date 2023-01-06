@@ -1,8 +1,18 @@
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Footer from '../layouts/Footer';
-import images from '../utils/images';
-export default function Landing() {
+import images from '../utils/images+icons';
+/**
+ * 
+ * @returns landing page
+ */
+export default function Landing() 
+{
+  /**
+   * page content
+   * note:
+   * >images.{content} is used to import an image or icon to the page.
+   */
   return (
   <>
     <section className='bg-gradient-to-r from-blue-200 flex flex-col min-h-screen justify-between '>

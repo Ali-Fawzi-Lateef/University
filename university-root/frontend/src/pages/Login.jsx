@@ -5,28 +5,48 @@ import "./../assets/backgroundStyles.css";
 import axios from '../utils/axios';
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const Login = () => {
-  
+/**
+ * 
+ * @returns login page.
+ */
+export default function Login ()  
+{
+  /**
+   * set refrence to email and error.
+   */
   const emailRef = useRef();
   const errRef = useRef();
-  
+
+  /**
+   * states variables.
+   */
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-
   const [errMsg, setErrMsg] = useState("");
+
+  /**
+   * react router navigation.
+   */
   const navigate = useNavigate();
 
-useEffect(() => {
-    emailRef.current.focus();
-}, [])
+  /**
+   * set foucs on email field whenever an error ocuarces
+   */
+  useEffect(() => {
+      emailRef.current.focus();
+  }, [])
+  useEffect(() => {
+      setErrMsg('');
+  }, [email, password])
 
-useEffect(() => {
-    setErrMsg('');
-}, [email, password])
-
-
+  /**
+   * 
+   * @param {event} e 
+   * send an http request to the rest api to login user
+   * using this credntials: email, password and rememberMe(Boolean variable).
+   * and navigate the user based on thier user_type.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     axios.post("/login", JSON.stringify({ email, password, rememberMe }))
@@ -34,11 +54,9 @@ useEffect(() => {
           if (response.statusText === "OK") {
               localStorage.setItem("isLoggedIn", true);
               localStorage.setItem("token", response.data.data.token);
-              // setemail('');
-              // setPassword('');
               switch (response.data.data.user_type) {
                 case 'admin':
-                  navigate('../AdminDashboard',{replace: true})
+                  navigate('../AdminDashboard/home',{replace: true})
                   break;
                 case 'teacher':
                   navigate('../TeacherDashboard',{replace: true})
@@ -51,13 +69,15 @@ useEffect(() => {
                   break;
               }
             }
-     
       }).catch ((err) =>  {
           console.log(err)
           setErrMsg(err.response.data.message)
             errRef.current.focus();
-        })
+      })
     }
+    /**
+     * page content
+     */
   return(
         <section id="Login" className="relative flex flex-col justify-center min-h-screen overflow-hidden">
           <div className="w-full sm:max-w-xl p-6 m-auto bg-white rounded-md shadow-xl shadow-gray-600/40 ring-2 ring-sky-600 lg:max-w-xl">
@@ -112,5 +132,3 @@ useEffect(() => {
       </section>
     )
 } 
-
-export default Login;

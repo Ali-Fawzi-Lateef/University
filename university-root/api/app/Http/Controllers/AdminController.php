@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\admin;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * get all users
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return response()->json('admin controller protected');
+        $user = User::all();
+        return response()->json($user);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * add new user
      *
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
-        //
+        
     }
 
     /**

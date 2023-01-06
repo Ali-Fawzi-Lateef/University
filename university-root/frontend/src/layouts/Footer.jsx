@@ -1,4 +1,9 @@
-function Footer() {
+/**
+ * 
+ * @returns Footer elemnt page.
+ */
+export default function Footer() 
+{
   return (
     <>
     <footer className="p-4">
@@ -41,5 +46,3 @@ function Footer() {
     </>
   )
 }
-
-export default Footer
