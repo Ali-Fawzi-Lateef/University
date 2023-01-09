@@ -1,96 +1,15 @@
-import { DataGrid , GridCellModes } from '@mui/x-data-grid';
+import { DataGrid  } from '@mui/x-data-grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { Button, CardActionArea } from '@mui/material';
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import axios from '../../utils/axios';
 import images from "../../utils/images+icons";
 import { Link } from 'react-router-dom';
 import Swal from "sweetalert2";
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-
-function EditToolbar(props) {
-  const { selectedCellParams, cellMode, cellModesModel, setCellModesModel } = props;
-
-  const handleSaveOrEdit = () => {
-    if (!selectedCellParams) {
-      return;
-    }
-    const { id, field } = selectedCellParams;
-    if (cellMode === 'edit') {
-      setCellModesModel({
-        ...cellModesModel,
-        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.View } },
-      });
-    } else {
-      setCellModesModel({
-        ...cellModesModel,
-        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.Edit } },
-      });
-    }
-  };
-
-  const handleCancel = () => {
-    if (!selectedCellParams) {
-      return;
-    }
-    const { id, field } = selectedCellParams;
-    setCellModesModel({
-      ...cellModesModel,
-      [id]: {
-        ...cellModesModel[id],
-        [field]: { mode: GridCellModes.View, ignoreModifications: true },
-      },
-    });
-  };
-
-  const handleMouseDown = (event) => {
-    // Keep the focus in the cell
-    event.preventDefault();
-  };
-
-  return (
-    <Box
-      sx={{
-        borderBottom: 1,
-        borderColor: 'divider',
-        p: 1,
-      }}
-    >
-      <Button
-        onClick={handleSaveOrEdit}
-        onMouseDown={handleMouseDown}
-        disabled={!selectedCellParams}
-        variant="outlined"
-      >
-        {cellMode === 'edit' ? 'Save' : 'Edit'}
-      </Button>
-      <Button
-        onClick={handleCancel}
-        onMouseDown={handleMouseDown}
-        disabled={cellMode === 'view'}
-        variant="outlined"
-        sx={{ ml: 1 }}
-      >
-        Cancel
-      </Button>
-    </Box>
-  );
-}
-
-EditToolbar.propTypes = {
-  cellMode: PropTypes.oneOf(['edit', 'view']).isRequired,
-  cellModesModel: PropTypes.object.isRequired,
-  selectedCellParams: PropTypes.shape({
-    field: PropTypes.string.isRequired,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  }),
-  setCellModesModel: PropTypes.func.isRequired,
-};
-
-
+import moment from 'moment';
+import EditUser from './EditUser';
 
 /**
  * count number of occurance in json
@@ -113,34 +32,13 @@ function getCount(arr, value)
 */
 export default function Users()
 {
-  const [selectedCellParams, setSelectedCellParams] = useState(null);
-  const [cellModesModel, setCellModesModel] = useState({});
 
-  const handleCellFocus = useCallback((event) => {
-    const row = event.currentTarget.parentElement;
-    const id = row.dataset.id;
-    const field = event.currentTarget.dataset.field;
-    setSelectedCellParams({ id, field });
-  }, []);
+  const [rowId, setRowId] = useState(null);
 
-  const cellMode = useMemo(() => {
-    if (!selectedCellParams) {
-      return 'view';
-    }
-    const { id, field } = selectedCellParams;
-    return cellModesModel[id]?.[field]?.mode || 'view';
-  }, [cellModesModel, selectedCellParams]);
+  //page size
+  const [pageSize, setPageSize] = useState(5);
 
-  const handleCellKeyDown = useCallback(
-    (params, event) => {
-      if (cellMode === 'edit') {
-        // Prevents calling event.preventDefault() if Tab is pressed on a cell in edit mode
-        event.defaultMuiPrevented = true;
-      }
-    },
-    [cellMode],
-  );
-
+  //get selected user id for delete feature
   const [selectedUser, setSelectedUser] = useState(0);
 
   // to make sure that api call happens only once.
@@ -192,6 +90,32 @@ export default function Users()
         }
       })
     }
+
+    const columns = useMemo(
+      () => [
+      { field: 'name', headerName: 'Full Name', width: 240, editable: true},
+      { field: 'username', headerName: 'Username', width: 180, editable: true},
+      { field: 'email', headerName: 'Email', width: 180, editable: true},
+      { field: 'user_type', headerName: 'Role', width: 130, type: 'singleSelect',
+      valueOptions: ['admin', 'teacher', 'student'],
+      editable: true,},
+      { field: 'verified_at', headerName: 'Verification Date',renderCell: (params) =>
+      moment(params.row.verified_at).format('YYYY-MM-DD HH:MM:SS'), width: 170},
+      { field: 'registered_at', headerName: 'Registeration Date',renderCell: (params) =>
+      moment(params.row.registered_at).format('YYYY-MM-DD HH:MM:SS'), width: 170},
+      { field: 'birthdate', headerName: 'Birthdate', editable: true},
+        {
+          field: 'actions',
+          headerName: 'Save',
+          type: 'actions',
+          renderCell: (params) => (
+            <EditUser {...{ params, rowId, setRowId }} />
+          ),
+        },
+      ],
+      [rowId]
+    );
+
     /**
      * page content
      */
@@ -286,46 +210,19 @@ export default function Users()
       <DataGrid
         rows={rows}
         columns={columns}
-        pageSize={10}
-        rowsPerPageOptions={[10]}
-        onCellKeyDown={handleCellKeyDown}
-        cellModesModel={cellModesModel}
-        onCellModesModelChange={(model) => setCellModesModel(model)}
-        components={{
-          Toolbar: EditToolbar
-        }}
-        componentsProps={{
-          toolbar: {
-            cellMode,
-            selectedCellParams,
-            setSelectedCellParams,
-            cellModesModel,
-            setCellModesModel,
-          },
-          cell: {
-            onFocus: handleCellFocus,
-          },
-        }}
-        experimentalFeatures={{ newEditingApi: true }}
+        rowsPerPageOptions={[5, 10, 20]}
+        pageSize={pageSize}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        getRowSpacing={(params) => ({
+          top: params.isFirstVisible ? 0 : 5,
+          bottom: params.isLastVisible ? 0 : 5,
+        })}
+        onCellEditCommit={(params) => setRowId(params.id)}
         onSelectionModelChange={(newSelectionArray) => {
         setSelectedUser(newSelectionArray[0])
-      }}
+        }}
       />
     </section>
     </>
   )
 }
-
-/**
- * users table fields
- */
-const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'name', headerName: 'Full Name', width: 240, editable: true},
-  { field: 'username', headerName: 'Username', width: 180, editable: true},
-  { field: 'email', headerName: 'Email', width: 180, editable: true},
-  { field: 'user_type', headerName: 'Type', width: 130, editable: true},
-  { field: 'verified_at', headerName: 'Verification Date',type:'date', width: 170},
-  { field: 'registered_at', headerName: 'Registeration Date',type:'date', width: 170},
-  { field: 'birthdate', headerName: 'Birthdate',type:'date', width: 120, editable: true},
-];

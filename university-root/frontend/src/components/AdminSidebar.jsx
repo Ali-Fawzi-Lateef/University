@@ -85,7 +85,7 @@ export default function AdminSidebar({children})
           ))}
         </List>
       </div>
-      <div className="h-screen flex-1 p-7">
+      <div className="h-screen flex-1 p-7 bg-slate-100">
         {children}
       </div>
     </section>
