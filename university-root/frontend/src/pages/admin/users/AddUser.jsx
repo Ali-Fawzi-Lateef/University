@@ -1,11 +1,9 @@
 import { Button, MenuItem, TextField } from "@mui/material"
 import { useNavigate } from "react-router-dom"
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import dayjs from 'dayjs';
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import Swal from "sweetalert2";
+import axios from "../../../utils/axios";
+
 
 const Roles = [
   {
@@ -29,13 +27,31 @@ export default function AddUser()
 {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const onSubmit = (data) => console.log(data);
-  console.log(errors);
-  const [value, setValue] = useState(dayjs('2014-08-18T21:11:54'));
-
-  const handleChange = (newValue) => {
-    setValue(newValue);
-  };
+  const onSubmit = (data) => {Swal.fire({
+    title:`
+    <p>Are you sure that you want to add this user?</p>
+    <span> Name: ${data.fullname} <span/>
+    <span> E-Mail: ${data.email} <span/>
+    <span> Username: ${data.username} <span/>
+    <span> Password: ${data.password} <span/>
+    <span> Role: ${data.role} <span/>
+    <span> Birthdate: ${data.birthdate} <span/>`,
+    showDenyButton: true,
+    confirmButtonText: 'Yes',
+    denyButtonText: `No`,
+  }).then((result)=>{
+    if (result.isConfirmed) {
+      axios.post('/addUser',JSON.stringify(data)).then((response)=>{
+        if(response.status === 200){
+          Swal.fire('User added Succesfuly!', '', 'success')
+          navigate(-1)
+        }
+      }).catch((error)=>{
+        Swal.fire(error.response.data.message, '', 'error')
+        console.log(error)
+      })
+    }
+  })};
   return (
     <section className=" w-full h-full">
       <h1 className=" font-semibold text-xl text-center mb-8">Add User</h1>
@@ -46,9 +62,9 @@ export default function AddUser()
           label="Full name"
           autoComplete='off'
           className="w-3/6 mr-32"
-          {...register("fullname", { required: "Name is required." })}
-          error={Boolean(errors.fullname)}
-          helperText={errors.fullname?.message}
+          {...register("name", { required: "Name is required." })}
+          error={Boolean(errors.name)}
+          helperText={errors.name?.message}
         />
         </span>
         <TextField
@@ -80,25 +96,16 @@ export default function AddUser()
         />
         <TextField
           size="small"
-          label="Repeat Password"
-          autoComplete='off'
-          className="w-3/6  mb-5 mr-32"
-          {...register("repeatedPassword", { required: "Repeadted Password is required." })}
-          error={Boolean(errors.repeatedPassword)}
-          helperText={errors.repeatedPassword?.message}
-        />
-        <TextField
-          size="small"
           autoComplete='off'
           className="w-2/6"
           select
           defaultValue=""
           label="Role"
-          inputProps={register('role', {
+          inputProps={register('user_type', {
             required: 'Please enter user role',
           })}
-          error={Boolean(errors.role)}
-          helperText={errors.role?.message}
+          error={Boolean(errors.user_type)}
+          helperText={errors.user_type?.message}
         >
           {Roles.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -106,24 +113,13 @@ export default function AddUser()
             </MenuItem>
           ))}
         </TextField>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-
-        <DesktopDatePicker
-                  inputProps={register('birthdate', {
-            required: 'Please enter user role',
-          })}
-          error={Boolean(errors.birthdate)}
-          helperText={errors.birthdate?.message}
-          label="Birthdate"
-          openTo="year"
-      format="dd-MMM-yyyy"
-      views={["year", "month", "date"]}    
-          value={value}
-          onChange={handleChange}
-          renderInput={(params) => <TextField {...params} />}
+        <p className="text-sm text-gray-600">User Birthdate</p>
+        <input 
+        type="date"
+        className={` w-3/6 h-12 text-xl font-extralight rounded-lg ${errors.birthdate && " focus:border-red-500 focus:ring-red-500 border-red-500"}`}
+        {...register("birthdate", { required: "birthdate is required." })}
         />
-        </LocalizationProvider>
-
+        {errors.birthdate && <p className=" text-sm text-red-500">{errors.birthdate.message}</p>}
         <div className="mt-6 flex justify-center">
           <Button variant="outlined" className="bg-sky-600 text-white hover:text-sky-600 w-2/6" type="submit">
             <span>Add User</span>

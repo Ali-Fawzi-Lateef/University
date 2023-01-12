@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Box, CircularProgress, Fab } from '@mui/material';
 import { green } from '@mui/material/colors';
-import axios from '../../utils/axios';
-import images from "../../utils/images+icons";
+import axios from '../../../utils/axios';
+import images from "../../../utils/images+icons";
 
 export default function EditUser({ params, rowId, setRowId }) 
 {

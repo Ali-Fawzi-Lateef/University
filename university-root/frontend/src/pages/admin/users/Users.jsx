@@ -4,8 +4,8 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { Button, CardActionArea } from '@mui/material';
 import { useEffect, useRef, useState, useMemo } from 'react';
-import axios from '../../utils/axios';
-import images from "../../utils/images+icons";
+import axios from '../../../utils/axios';
+import images from "../../../utils/images+icons";
 import { Link } from 'react-router-dom';
 import Swal from "sweetalert2";
 import moment from 'moment';
@@ -80,7 +80,7 @@ export default function Users()
           }).catch((error)=>{
             Swal.fire({
               title:"failed to delete user!",
-              text:error.message,
+              text:error.response.data.message,
               confirmButtonColor:"#0ea5e9",
               confirmButtonText:"OK",
               icon:"error",

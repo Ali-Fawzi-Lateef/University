@@ -49,7 +49,6 @@ class UserController extends Controller
             'name' => ['required', 'string'],
             'username' => ['required', 'string'],
             'user_type' => ['required', 'string'],
-            'birthdate'=> ['nullable','date_format:Y-m-d']
             ]);
         return $this->user->editUser($request) ? 
         $this->success(null,"User edited succseefuly") : 

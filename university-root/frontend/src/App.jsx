@@ -9,8 +9,8 @@ import Apply from "./pages/Apply";
 import ProtectedRoutes from "./utils/protectedRoutes";
 import Home from "./pages/admin/Home";
 import Account from "./pages/admin/Account";
-import Users from "./pages/admin/Users";
-import AddUser from "./pages/admin/AddUser";
+import Users from "./pages/admin/users/Users";
+import AddUser from "./pages/admin/users/AddUser";
 
 /**
  * 
