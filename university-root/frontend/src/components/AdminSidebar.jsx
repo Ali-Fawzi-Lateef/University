@@ -31,7 +31,7 @@ export default function AdminSidebar({children})
     { title: "Search", Src: images.AccountCircle , path: './account' },
     { title: "Analytics", Src: images.AccountCircle , path: './account' },
     { title: "Files ", Src: images.AccountCircle, gap: true , path: './account' },
-    { title: "Setting", Src: images.AccountCircle , path: './account' },
+    { title: "Logout", Src: images.AccountCircle , path: './logout' },
   ];
 
   /**

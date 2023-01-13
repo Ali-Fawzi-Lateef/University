@@ -11,6 +11,7 @@ import Home from "./pages/admin/Home";
 import Account from "./pages/admin/Account";
 import Users from "./pages/admin/users/Users";
 import AddUser from "./pages/admin/users/AddUser";
+import Logout from "./pages/Logout";
 
 /**
  * 
@@ -33,6 +34,7 @@ export default function App()
             <Route path="home" element={<Home />} />
             <Route path="account" element={<Account />} />
             <Route path="users" element={<Users />} />
+            <Route path="logout" element={<Logout />} />
             <Route path="users/addUser" element={<AddUser />} />
           </Route>
         </Route>
