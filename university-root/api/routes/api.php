@@ -20,6 +20,9 @@ Route::group([
 Route::group(['middleware' => ['auth:sanctum','abilities:admin']], function () {
     Route::get('/index', [UserController::class, 'getAllUsers']);
     Route::post('/deleteUser', [UserController::class, 'deleteUser']);
+
+    Route::get('/getTeacherSalary', [UserController::class, 'getTeacherSalary']);
+
     Route::post('/addUser', [UserController::class, 'addUser']);
     Route::post('/editUser', [UserController::class, 'editUser']);
     Route::post('/logout', [AuthController::class, 'logout']);

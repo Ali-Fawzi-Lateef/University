@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\teacher;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponeses;
 use App\Repositories\Interfaces\IUserRepository;
@@ -53,5 +55,11 @@ class UserController extends Controller
         return $this->user->editUser($request) ? 
         $this->success(null,"User edited succseefuly") : 
         $this->error(null,"failed to edit user",500);
+    }
+    public function getTeacherSalary(Request $request)
+    {
+        $user = User::find($request->id);
+        $teacher = teacher::whereBelongsTo($user)->get();
+        return $user;
     }
 }

@@ -30,11 +30,11 @@ export default function AddUser()
   const onSubmit = (data) => {Swal.fire({
     title:`
     <p>Are you sure that you want to add this user?</p>
-    <span> Name: ${data.fullname} <span/>
+    <span> Name: ${data.name} <span/>
     <span> E-Mail: ${data.email} <span/>
     <span> Username: ${data.username} <span/>
     <span> Password: ${data.password} <span/>
-    <span> Role: ${data.role} <span/>
+    <span> Role: ${data.user_type} <span/>
     <span> Birthdate: ${data.birthdate} <span/>`,
     showDenyButton: true,
     confirmButtonText: 'Yes',
