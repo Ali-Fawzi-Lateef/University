@@ -13,11 +13,11 @@ use Illuminate\Routing\Controller;
 class AuthController extends Controller
 {
     /**
-     * custum Trait to hanlde Responeses messages.
+     * custom Trait to handle Responses messages.
      */
     use HttpResponeses;
 
-    public function register(Request $request) 
+    public function register(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'string', 'email'],
@@ -30,7 +30,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            
+
         ]);
 
         return $this->success([
@@ -39,16 +39,17 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout() 
+    public function logout()
     {
         Auth::user()->currentAccessToken()->delete();
 
         return $this->success([
-            'message' => 'You have succesfully been logged out and your token has been removed'
+            'message' => 'You have successfully been logged out and your token has been removed'
         ]);
     }
 
-    public function login(Request $request){
+    public function login(Request $request): \Illuminate\Http\JsonResponse
+    {
 
         $validated = $request->validate([
         'email' => ['required', 'string', 'email'],
@@ -63,7 +64,7 @@ class AuthController extends Controller
         return $this->success([
             'user_type' => $user->user_type,
             'token' => $user->createToken('API Token',[$user->user_type])->plainTextToken
-        ]); 
+        ]);
         return $this->error('', 'User is not verified',401);
     }
 
