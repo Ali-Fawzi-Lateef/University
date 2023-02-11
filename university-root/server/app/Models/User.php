@@ -22,7 +22,6 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'verified_at',
         'registered_at',
         'birthdate',
         'profile_photo_url'
@@ -48,29 +47,16 @@ class User extends Authenticatable
     ];
 
     /**
-     * Prevent elqouent from creating created_at updated_at fields.
+     * Prevent eloquent from creating created_at updated_at fields.
      * @var bool
      */
     public $timestamps = false;
 
     /**
-     * user table has a one to one relationship with the following;
-     * admin, teacher, graduatedStudent, student.
+     * @return hasOne
      */
-    public function admin()
+    public function grades()
     {
-        return $this->hasOne(admin::class);
-    }
-    public function teacher()
-    {
-        return $this->hasOne(teacher::class);
-    }
-    public function graduatedStudent()
-    {
-        return $this->hasOne(graduatedStudent::class);
-    }
-    public function student()
-    {
-        return $this->hasOne(student::class);
+        return $this->hasOne(Grades::class);
     }
 }

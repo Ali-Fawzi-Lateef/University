@@ -3,6 +3,7 @@ import { Box, CircularProgress, Fab } from '@mui/material';
 import { green } from '@mui/material/colors';
 import axios from '../../../utils/axios';
 import images from "../../../utils/images+icons";
+import Swal from "sweetalert2";
 
 export default function EditUser({ params, rowId, setRowId }) 
 {
@@ -16,7 +17,8 @@ export default function EditUser({ params, rowId, setRowId })
                 setRowId(null);
             }
         }).catch((error)=>{
-            console.log(error);
+            Swal.fire(error.response.data.message, '', 'error')
+            console.log(error)
         })
         setLoading(false);
       };

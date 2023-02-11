@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-use App\Traits\HttpResponeses;
+use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Hash;
@@ -15,29 +15,7 @@ class AuthController extends Controller
     /**
      * custom Trait to handle Responses messages.
      */
-    use HttpResponeses;
-
-    public function register(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $validated = $request->validate([
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string', 'min:8'],
-            'name' => ['required', 'string']
-            ]);
-        $request->validated($request->only(['name', 'email', 'password']));
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-
-        ]);
-
-        return $this->success([
-            'user' => $user,
-            'token' => $user->createToken('API Token')->plainTextToken
-        ]);
-    }
+    use HttpResponses;
 
     public function logout()
     {
@@ -48,24 +26,22 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function login(Request $request){
 
         $validated = $request->validate([
         'email' => ['required', 'string', 'email'],
         'password' => ['required', 'string', 'min:8'],
         ]);
-        if(!Auth::attempt($request->only(['email', 'password'] ,$request->rememberMe ?? false))) {
-            return $this->error('', 'Credentials do not match', 401);
+        if(!Auth::attempt($request->only(['email', 'password']))) {
+            return $this->error('',  401, 'Credentials do not match');
         }
         $user = User::where('email', $request->email)->first();
 
-        if(!is_null($user->verified_at))
         return $this->success([
             'user_type' => $user->user_type,
+            'name' => $user->name,
             'token' => $user->createToken('API Token',[$user->user_type])->plainTextToken
         ]);
-        return $this->error('', 'User is not verified',401);
     }
 
 }

@@ -1,6 +1,4 @@
 import { Button, TextField } from "@mui/material";
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import "./../assets/backgroundStyles.css";
 import axios from '../utils/axios';
 import { useRef, useState, useEffect } from "react";
@@ -22,7 +20,6 @@ export default function Login ()
    */
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
   /**
@@ -49,23 +46,25 @@ export default function Login ()
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.post("/login", JSON.stringify({ email, password, rememberMe }))
+    axios.post("/login", JSON.stringify({ email, password }))
       .then((response) => {
           if (response.statusText === "OK") {
               localStorage.setItem("isLoggedIn", true);
               localStorage.setItem("token", response.data.data.token);
+              localStorage.setItem("name", response.data.data.name);
+              localStorage.setItem("reloadCount", 0);
               switch (response.data.data.user_type) {
                 case 'admin':
                   navigate('../AdminDashboard/home',{replace: true})
                   break;
                 case 'teacher':
-                  navigate('../TeacherDashboard',{replace: true})
+                  navigate('../TeacherDashboard/home',{replace: true})
                   break;
                 case 'student':
-                  navigate('../StudentDashboard',{replace: true})
+                  navigate('../StudentDashboard/home',{replace: true})
                   break;
                 default:
-                  navigate('../unVerfied',{replace: true})
+                  navigate('../unVerified',{replace: true})
                   break;
               }
             }
@@ -85,7 +84,7 @@ export default function Login ()
                 Welcome Back
               </h1>
               <p ref={errRef} className="text-red-500" aria-live="assertive">{errMsg}</p>
-              <form className="mt-6" onSubmit={handleSubmit}>
+              <form className="mt-10" onSubmit={handleSubmit}>
                 <div className="mb-10">
                 <TextField 
                 autoComplete="off"
@@ -100,7 +99,7 @@ export default function Login ()
                  />
                 </div>
                 
-                <div className="mb-4">
+                <div className="mb-16">
                 <TextField 
                 id="password" 
                 label="Password" 
@@ -112,17 +111,7 @@ export default function Login ()
                 error = {errMsg !== ""}
                 />
                 </div>
-                
-                <p className="text-xs mb-8 text-blue-500 hover:underline">
-                  Forget Password?
-                </p>
-                <FormControlLabel control={<Checkbox />} 
-                  label="Remeber me"
-                  id="rememberMe"
-                  value={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.value)}
-                /> 
-                <div className="mt-12 flex justify-center">
+                <div className="mt-16 flex justify-center">
                   <Button variant="outlined" className="bg-sky-600 text-white hover:text-sky-600 w-full" type="submit">
                     <span>Login</span>
                   </Button>

@@ -9,6 +9,9 @@ import icon6 from '@mui/icons-material/PersonAdd';
 import icon7 from '@mui/icons-material/PersonRemove';
 import icon8 from '@mui/icons-material/Check';
 import icon9 from '@mui/icons-material/Save';
+import icon10 from '@mui/icons-material/Error';
+import icon11 from '@mui/icons-material/HourglassEmpty';
+import icon12 from '@mui/icons-material/Logout';
 /**
  * includes images and material ui icons.
  */
@@ -25,6 +28,10 @@ const imagesIcons =
     'PersonRemove': icon7,
     'Check': icon8,
     'Save': icon9,
+    'Error': icon10,
+    'HourglassEmpty': icon11,
+    'Logout': icon12,
+
 
 } 
 export default imagesIcons

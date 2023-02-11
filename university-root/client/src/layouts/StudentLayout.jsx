@@ -4,17 +4,17 @@ import images from "../utils/images+icons";
 /**
  * use Sidebar for all admin child components.
  */
-const AdminLayout = () => (
+const TeacherLayout = () => (
     <Sidebar
-    Menus={Menus}>
-    <Outlet />
+        Menus={Menus}>
+        <Outlet />
     </Sidebar>
 );
 const Menus = [
     { title: "Home", Src: images.Home, path: './home' },
-    { title: "Users", Src: images.Users, path: './users' },
+    { title: "Grades", Src: images.Users, path: './Grades' },
     { title: "Test", Src: images.HourglassEmpty ,gap:true, path: './testPage' },
     { title: "404 Test", Src: images.Error,  path: './Url'},
     { title: "Logout", Src: images.Logout , gap: true , path: './logout' },
 ];
-export default AdminLayout;
+export default TeacherLayout;

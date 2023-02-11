@@ -12,7 +12,7 @@ import moment from 'moment';
 import EditUser from './EditUser';
 
 /**
- * count number of occurance in json
+ * count number of occurrence in json
  * used to count number of 
  * (admins, teachers, students)
  */
@@ -54,7 +54,7 @@ export default function Users()
         dataFetchedRef.current = true;
         axios.get('/index').then((respone)=>{
           setRows(respone.data)
-        })  
+        })
     },[])
 
     const RemoveUser = () =>{
@@ -93,7 +93,7 @@ export default function Users()
 
     const columns = useMemo(
       () => [
-      { field: 'name', headerName: 'Full Name', width: 240, editable: true},
+      { field: 'name', headerName: 'Full Name', width: 220, editable: true},
       { field: 'username', headerName: 'Username', width: 180, editable: true},
       { field: 'email', headerName: 'Email', width: 180, editable: true},
       { field: 'user_type', headerName: 'Role', width: 130, type: 'singleSelect',
@@ -120,9 +120,9 @@ export default function Users()
      * page content
      */
     return (
-      <>
+      <div className="h-full">
     {/* cards */}
-    <span className='flex flex-row mb-4 space-x-32'>
+    <span className='flex flex-row mb-4 justify-between'>
      <Card sx={{ maxWidth: 345 }}>
       <CardActionArea className='flex flex-row mr-24'>
         <images.Person
@@ -212,6 +212,7 @@ export default function Users()
         columns={columns}
         rowsPerPageOptions={[5, 10, 20]}
         pageSize={pageSize}
+        sx={{maxHeight : 620}}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         getRowSpacing={(params) => ({
           top: params.isFirstVisible ? 0 : 5,
@@ -223,6 +224,6 @@ export default function Users()
         }}
       />
     </section>
-    </>
+    </div>
   )
 }

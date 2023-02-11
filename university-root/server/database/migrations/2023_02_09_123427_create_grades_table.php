@@ -13,16 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->string("username")->unique();
-            $table->string("email")->unique();
-            $table->string("password");
-            $table->timestamp("registered_at")->nullable();
-            $table->date("birthdate")->nullable();
-            $table->string("user_type")->nullable();
-            $table->rememberToken();
+            $table->integer("subject1");
+            $table->integer("subject2");
+            $table->integer("subject3");
+            $table->integer("subject4");
+            $table->integer("subject5");
+            $table->integer("Year");
+            $table->foreignId('user_id')->references('id')->on('users')->cascadeOnDelete();
+
         });
     }
 
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('grades');
     }
 };

@@ -4,11 +4,10 @@ namespace App\Repositories\Interfaces;
 
 use Illuminate\Http\Request;
 
-interface IUserRepository {
+interface IUserRepository
+{
 
     public function getAllUsers();
-
-    public function getUserById($id);
 
     public function addUser(Request $request);
 

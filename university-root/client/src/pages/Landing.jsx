@@ -30,12 +30,7 @@ export default function Landing()
               Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatum cumque dolore, reprehenderit voluptate numquam dolor quis quidem autem dicta tempora, rerum nesciunt labore ut, veritatis quam facilis odio corporis quisquam!</p>
               <div className='inline-flex items-center justify-center py-3 mr-3'>
                 <Link to={"login"}>
-                  <Button variant="outlined" className='text-gray-700 hover:text-gray-800'>Login</Button>
-                </Link>
-              </div>
-              <div className='inline-flex items-center justify-center py-3 mr-3'>
-                <Link to={"apply"}>
-                  <Button variant="outlined" className='text-slate-50 bg-sky-600 hover:text-gray-800'>Apply</Button>
+                  <Button variant="outlined" className='text-slate-50 bg-sky-600 hover:text-gray-800'>Login</Button>
                 </Link>
               </div>
             </div>
